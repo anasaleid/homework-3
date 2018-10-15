@@ -1,14 +1,4 @@
-I am the parent.  I am waiting for my child 9266 to die.
-I am the child!  I have pid 9266.
 hw3
 hw3.c
 testing.txt
-My child has died with status 0. :(
-CS361 > word: ls
-I am the parent.  I am waiting for my child 3064 to die.
-I am the child!  I have pid 3064.
-hw3
-hw3.c
-testing.txt
-My child has died with status 0. :(
-CS361 > 
+pid:31980 status:0

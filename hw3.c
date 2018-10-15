@@ -9,9 +9,9 @@ int main(){
   //create some space for our strings
   char line[500];
   char argsarray[20][100];
-
+  int currentStdout = dup(1);
   //print prompt
-  printf("CS361 > ");
+  printf("CS361 >");
   //read line from terminal
   fgets(line, 500, stdin);
 
@@ -19,7 +19,6 @@ int main(){
   char *word = strtok(line, " \n");
   int i = 0;
   while (strcmp(word, "exit") != 0) {
-    printf("word: %s\n", word);
     //copy a word to the arg array
     strcpy(argsarray[i], word);
 	if (strcmp(argsarray[i], ">") == 0)
@@ -39,25 +38,32 @@ int main(){
 
     if(word == NULL || strcmp(word, ";") == 0)
 	{
+		int newFile;
 		if (redirect == 1)
 		{
-			int newFile = open(argsarray[i], O_RDWR | O_CREAT, 0666);
+			newFile = open(argsarray[i], O_RDWR | O_CREAT | O_TRUNC, 0666);
 			dup2(newFile, 1);
 		}
 		else if (redirect == 2)
 		{
-			int newFile = open(argsarray[i], O_RDWR | O_CREAT, 0666);
+			newFile = open(argsarray[i], O_RDWR | O_CREAT, 0666);
 			dup2(newFile, 0);
 		}
 
 		int pid = fork();
-		if (pid == 0) {
-			printf("I am the child!  I have pid %d.\n", getpid());
+		if (pid == 0){
 			
 			const char arg[10];
-			if (redirect == 1 || redirect == 2)
+			if (redirect == 1)
 			{
 				execlp(argsarray[i-2], arg,  NULL );
+			}
+			else if( redirect == 2)
+			{
+				char buf[100];
+				FILE * filePointer = fopen(argsarray[i-2], "r");
+				fgets(buf, 101, filePointer);
+				execlp(buf, arg, NULL);
 			}
 			else if (redirect == 3)
 			{
@@ -67,18 +73,17 @@ int main(){
 			{
 				execlp(argsarray[i], arg,  NULL);
 			}
-			exit(6);
 		}
 		else {
-			printf("I am the parent.  I am waiting for my child %d to die.\n", pid);
 			int status;
 			wait(&status);
-			printf("My child has died with status %d. :(\n", WEXITSTATUS(status));
+			printf("pid:%d status:%d\n", pid, WEXITSTATUS(status));
 		}
 
 		if(word == NULL)
 		{
-			printf("CS361 > ");
+			dup2(currentStdout, 1);	
+			printf("CS361 >");
 			fgets(line, 500, stdin);
 			word = strtok(line, " \n");
 		}		
