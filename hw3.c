@@ -29,10 +29,6 @@ int main(){
 	{
 		redirect = 2;
 	}
-	else if (strcmp(argsarray[i], ";") == 0)
-	{
-		redirect = 3;
-	}
     //get next word
     word = strtok(NULL, " \n");
 
@@ -65,10 +61,6 @@ int main(){
 				fgets(buf, 101, filePointer);
 				execlp(buf, arg, NULL);
 			}
-			else if (redirect == 3)
-			{
-				execlp(argsarray[i - 1], arg,  NULL);
-			}
 			else
 			{
 				execlp(argsarray[i], arg,  NULL);
@@ -86,9 +78,12 @@ int main(){
 			printf("CS361 >");
 			fgets(line, 500, stdin);
 			word = strtok(line, " \n");
-		}		
+		}
+				
 		redirect = 0;
 	}
+
+
   	i = i+1; 
   }
 }
