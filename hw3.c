@@ -50,9 +50,11 @@ int main(){
         fileName = word;
   	newFile = open(fileName, O_RDONLY , 0666);
         dup2(newFile, 0);
-        fgets(line, 500, stdin);
-        word = strtok(line, " \n");
-        argsarray[i] = word;
+	
+	fgets(line, 500, stdin);
+	word = strtok(line, " \n");
+	argsarray[i] = word;
+	printf("WORD: %s\n", word);
   }
   else if(strcmp(word, ";") == 0)
   {
@@ -75,13 +77,12 @@ int main(){
 
   if(word == NULL || strcmp(word, ";") == 0)
 	{
+		close(newFile);
 		int pid = fork();
 		if (pid == 0){			
 			execvp(argsarray[0], argsarray);
 		}
 		else {
-			dup2(currentStdout, 1);
-			dup2(currentStdIn, 0);
 			int status;
 			wait(&status);
 			printf("pid:%d status:%d\n", pid, WEXITSTATUS(status));
@@ -90,17 +91,19 @@ int main(){
 		if(word == NULL)
 		{	
 			int j;
-			for(j = 0; j < i; j++)
+			for(j = 0; j <= i; j++)
 			{
 				argsarray[j] = NULL;
 			}	
 			printf("CS361 >");
+			dup2(currentStdout, 1);
+                        dup2(currentStdIn, 0);
 			fgets(line, 500, stdin);
 			word = strtok(line, " \n");
 		}
 		i= 0;			
 	
-      }
+       }
   }
 }
 
