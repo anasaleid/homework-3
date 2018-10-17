@@ -33,7 +33,7 @@ int main(){
   int i = 0;
   char * fileName;
 
-  while (strcmp(word, "exit") != 0) {  
+  while (strcmp(word, "exit") != 0 && redirect != 2) {  
   
   if (strcmp(word, ">") == 0)
   {
@@ -88,10 +88,9 @@ int main(){
 			}
 			else if( redirect == 2)
 			{
-				char buf[100];
-				FILE * filePointer = fopen(argsarray[i], "r");
-				fgets(buf, 101, filePointer);
-				execvp(buf, argsarray);
+				FILE * filePointer = fopen(fileName, "r");
+				fgets(line, 101, filePointer);
+				execvp(argsarray[0], argsarray);
 			}
 			else
 			{	
@@ -99,6 +98,7 @@ int main(){
 			}
 		}
 		else {
+			dup2(currentStdout, 1);
 			int status;
 			wait(&status);
 			printf("pid:%d status:%d\n", pid, WEXITSTATUS(status));
@@ -110,8 +110,7 @@ int main(){
 			for(j = 0; j < i; j++)
 			{
 				argsarray[j] = NULL;
-			}
-			dup2(currentStdout, 1);	
+			{	
 			printf("CS361 >");
 			fgets(line, 500, stdin);
 			word = strtok(line, " \n");
@@ -119,4 +118,6 @@ int main(){
 		i= 0;			
 	}
   }
+}
+}
 }
