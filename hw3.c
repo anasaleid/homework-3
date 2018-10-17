@@ -18,11 +18,13 @@ void int_Handler2(int sig){
 int main(){
   signal(SIGINT, int_Handler);
   signal(SIGTSTP, int_Handler2);	
-  int redirect = 0; 
+  
 //create some space for our strings
   char line[500];
   char **argsarray = malloc(sizeof(char*) * 20);
   int currentStdout = dup(1);
+  int currentStdIn = dup(0);
+  int newFile;
   //print prompt
   printf("CS361 >");
   //read line from terminal
@@ -33,19 +35,24 @@ int main(){
   int i = 0;
   char * fileName;
 
-  while (strcmp(word, "exit") != 0 && redirect != 2) {  
+  while (strcmp(word, "exit") != 0) {  
   
   if (strcmp(word, ">") == 0)
   {
-	redirect = 1;
 	word = strtok(NULL, " \n");
 	fileName = word;
+        newFile = open(fileName, O_RDWR | O_CREAT | O_TRUNC, 0666);
+        dup2(newFile, 1);
   }
   else if (strcmp(word, "<") == 0)
   {
-	redirect = 2;
 	word = strtok(NULL, " \n");
         fileName = word;
+  	newFile = open(fileName, O_RDONLY , 0666);
+        dup2(newFile, 0);
+        fgets(line, 500, stdin);
+        word = strtok(line, " \n");
+        argsarray[i] = word;
   }
   else if(strcmp(word, ";") == 0)
   {
@@ -68,37 +75,13 @@ int main(){
 
   if(word == NULL || strcmp(word, ";") == 0)
 	{
-		int newFile;
-		if (redirect == 1)
-		{
-			newFile = open(fileName, O_RDWR | O_CREAT | O_TRUNC, 0666);
-			dup2(newFile, 1);
-		}
-		else if (redirect == 2)
-		{
-			newFile = open(fileName, O_RDWR | O_CREAT, 0666);
-			dup2(newFile, 0);
-		}
-
 		int pid = fork();
-		if (pid == 0){		
-			if (redirect == 1)
-			{ 
-				execvp(argsarray[0], argsarray);
-			}
-			else if( redirect == 2)
-			{
-				FILE * filePointer = fopen(fileName, "r");
-				fgets(line, 101, filePointer);
-				execvp(argsarray[0], argsarray);
-			}
-			else
-			{	
-				execvp(argsarray[0], argsarray);
-			}
+		if (pid == 0){			
+			execvp(argsarray[0], argsarray);
 		}
 		else {
 			dup2(currentStdout, 1);
+			dup2(currentStdIn, 0);
 			int status;
 			wait(&status);
 			printf("pid:%d status:%d\n", pid, WEXITSTATUS(status));
@@ -110,14 +93,14 @@ int main(){
 			for(j = 0; j < i; j++)
 			{
 				argsarray[j] = NULL;
-			{	
+			}	
 			printf("CS361 >");
 			fgets(line, 500, stdin);
 			word = strtok(line, " \n");
 		}
 		i= 0;			
-	}
+	
+      }
   }
 }
-}
-}
+
