@@ -47,6 +47,17 @@ int main(){
 	word = strtok(NULL, " \n");
         fileName = word;
   }
+  else if(strcmp(word, ";") == 0)
+  {
+	word = strtok(NULL, " \n");
+        int j;
+        for(j = 0; j < i; j++)
+        {
+        	argsarray[j] = NULL;
+        }
+	i = 0;
+	argsarray[i] = word;
+  }
   else
   {
   	argsarray[i] = word;
