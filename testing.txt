@@ -1,4 +1,2 @@
-hw3
-hw3.c
-testing.txt
-pid:31980 status:0
+1234
+pid:6813 status:0
